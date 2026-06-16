@@ -7,9 +7,23 @@ $dbname = "evelynlim";
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+if(isset($_POST['email'])) {
+  echo $_POST['email'];
+}
+
+$message="";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM student WHERE email = '$email' AND password = '$password'";
+    $result = $conn->query($sql);
+   
+    if ($result->num_rows > 0) {
+        echo "User Found";
+    } else {
+        echo "User is not found";
+    }
 }
 ?>
 
@@ -30,11 +44,13 @@ if ($conn->connect_error) {
       align-items: center;
       height: 100vh;
     }
+
     </style>
 </head>
 <body>
+
   <div id="email">
-    <form target="_self" method="post">
+    <form target="_self" method="POST">
       <h2>Enter your Email:</h2>
       <input type="text" name="email">
         <br />
