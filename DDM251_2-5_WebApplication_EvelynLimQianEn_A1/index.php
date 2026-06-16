@@ -5,29 +5,34 @@ $password = "CphpmI1W5Xsd/C1x";
 $dbname = "exercise_1";
 
 // Create connection
+
+$message = "";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-$message="";
+if ($conn->connect_error) {
+    $message = "Database connection failed: " . $conn->connect_error . "<br>";
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     if ($username == "") {
-        $user_error = "* Please enter your username.";
+        $message = $message . "* Please enter your username.<br/>";
     }
     
     if ($password == "") {
-        $pass_error = "* Please enter your password.";
+        $message = $message . "* Please enter your password.<br/>";
     }
 
-    if ($username != "" && $password != "") {
+    if ($username != "" && $password != "" && !$conn->connect_error) {
         $sql = "SELECT * FROM customers WHERE username = '$username' AND password = '$password'";
         $result = $conn->query($sql);
         
         if ($result->num_rows > 0) {
-            echo "User Found";
+            $message = "User Found";
         } else {
-            echo "User is not found";
+            $message =  "User is not found";
         }
     }
 }
@@ -54,16 +59,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     </style>
 <body>
+    
+<div id="username">
+        <div style="color: red; font-weight: bold;">
+            <?php echo $message; ?>
+        </div>
 
-    <div id="username">
         <form target="_self" method="POST">
-        <h2>Username</h2>
-        <input type="text" name="username" placeholder="Username" required>
+            <h2>Username</h2>
+            <input type="text" name="username" placeholder="Username">
             <br />
             <h2>Password</h2>
-            <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="password" placeholder="Password">
+            <br /><br />
             <input type="submit">
         </form>
-  </div>
+    </div>
 </body>
 </html>
