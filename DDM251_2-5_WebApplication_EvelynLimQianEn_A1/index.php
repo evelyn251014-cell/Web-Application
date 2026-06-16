@@ -31,17 +31,15 @@ if ($username != "" && $password != "" && !$conn->connect_error) {
         $result = $conn->query($sql);
         
         if ($result->num_rows > 0) {
-
             $row = $result->fetch_assoc();
-            
             if ($row['Password'] == $password) {
-                $message = "Customer Found";
+                echo"Customer Found";
+                 header("Location: customer.php");
             } else {
-                $message = "Your password is incorrect";
-            }
-            
+                $message = "* Your password is incorrect.<br/>";
+            } 
         } else {
-            $message = "Customer is not found";
+            echo "Customer is not found";
         }
     }
 }
@@ -66,10 +64,27 @@ if ($username != "" && $password != "" && !$conn->connect_error) {
       height: 100vh;
     }
 
+    .username {
+        border: 2px solid black;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 30px;
+    }
+
+    .submit{
+        display: block;
+        margin: auto;
+    }
+
     </style>
 <body>
 
-<div id="username">
+    <div class="username">
+        <h1 class="title">Welcome</h1>
         <div style="color: red; font-weight: bold;">
             <?php echo $message; ?>
         </div>
@@ -81,7 +96,7 @@ if ($username != "" && $password != "" && !$conn->connect_error) {
             <h2>Password</h2>
             <input type="password" name="Password" placeholder="Password">
             <br /><br />
-            <input type="submit">
+            <input type="submit" class="submit" value="Login">
         </form>
     </div>
 </body>
