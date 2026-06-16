@@ -14,8 +14,8 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = $_POST['Username'];
+    $password = $_POST['Password'];
 
     if ($username == "") {
         $message = $message . "* Please enter your username.<br/>";
@@ -25,14 +25,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = $message . "* Please enter your password.<br/>";
     }
 
-    if ($username != "" && $password != "" && !$conn->connect_error) {
-        $sql = "SELECT * FROM customers WHERE username = '$username' AND password = '$password'";
+if ($username != "" && $password != "" && !$conn->connect_error) {
+        
+        $sql = "SELECT * FROM customers WHERE Username = '$username'";
         $result = $conn->query($sql);
         
         if ($result->num_rows > 0) {
-            $message = "User Found";
+
+            $row = $result->fetch_assoc();
+            
+            if ($row['Password'] == $password) {
+                $message = "Customer Found";
+            } else {
+                $message = "Your password is incorrect";
+            }
+            
         } else {
-            $message =  "User is not found";
+            $message = "Customer is not found";
         }
     }
 }
@@ -59,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     </style>
 <body>
-    
+
 <div id="username">
         <div style="color: red; font-weight: bold;">
             <?php echo $message; ?>
@@ -67,10 +76,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form target="_self" method="POST">
             <h2>Username</h2>
-            <input type="text" name="username" placeholder="Username">
+            <input type="text" name="Username" placeholder="Username">
             <br />
             <h2>Password</h2>
-            <input type="password" name="password" placeholder="Password">
+            <input type="password" name="Password" placeholder="Password">
             <br /><br />
             <input type="submit">
         </form>
