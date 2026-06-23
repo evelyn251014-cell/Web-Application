@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $servername = "localhost";
 $username = "evelynlim";
 $password = "KOhWKf)4RH8MN.AO";
@@ -10,6 +12,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
+
+$email= $_SESSION['email']
 ?>
 
 <!DOCTYPE html>
@@ -41,12 +45,12 @@ if ($conn->connect_error) {
      </tr>
 
     <?php 
-    $sql = "SELECT * FROM student";
+    $sql = "SELECT * FROM student WHERE email ='$email'";
     $result = $conn->query($sql);
 
     while($row = $result->fetch_assoc()) {
     ?> 
-        <tr> 
+        <tr>  
             <td><?php echo $row['name']; ?></td>
             <td><?php echo $row['email']; ?></td>
             <td><?php echo $row['yearjoin']; ?></td>

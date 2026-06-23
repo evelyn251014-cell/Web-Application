@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $servername = "localhost";
 $username = "evelynlim";
 $password = "KOhWKf)4RH8MN.AO";
@@ -7,8 +9,8 @@ $dbname = "evelynlim";
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-if(isset($_POST['email'])) {
-  echo $_POST['email'];
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
 $message="";
@@ -20,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $conn->query($sql);
    
     if ($result->num_rows > 0) {
+      $_SESSION['email'] = $_POST['email'];
       header("Location:booklist.php");
         echo "User Found";
     } else {
@@ -49,7 +52,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-
   <div id="email">
     <form target="_self" method="POST">
       <h2>Enter your Email:</h2>
@@ -60,5 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="submit">
     </form>
   </div>
+
+
 </body>
 </html>
