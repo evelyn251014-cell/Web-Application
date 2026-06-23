@@ -27,8 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 if ($username != "" && $password != "" && !$conn->connect_error) {
         
-        $sql = "SELECT * FROM customers WHERE Username = '$username'";
-        $result = $conn->query($sql);
+   $sql = "SELECT * FROM customers WHERE Username = '$username'";
+    $result = $conn->query($sql);
         
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
@@ -43,6 +43,7 @@ if ($username != "" && $password != "" && !$conn->connect_error) {
         }
     }
 }
+ mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
