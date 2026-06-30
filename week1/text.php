@@ -14,11 +14,15 @@ if (!$conn) {
 }
 
 // SQL to update a record
-$sql = "UPDATE student SET name='Joe' WHERE email='".$_SESSION["email"]."', password='".$_SESSION["password"]."', yearjoin='".$_SESSION["yearjoin"]."'" ;
-
+$sql = "UPDATE student
+        SET
+            name='" . $_POST["name"] . "',
+            password='" . $_POST["password"] . "',
+            yearjoin='" . $_POST["yearjoin"] . "'
+        WHERE email='" . $_SESSION["email"] . "'";
+        
 if (mysqli_query($conn, $sql)) {
   header("Location:profile.php");
-  echo "Record updated successfully";
 } else {
   echo "Error updating record: " . mysqli_error($conn);
 }

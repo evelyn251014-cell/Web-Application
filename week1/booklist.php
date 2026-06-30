@@ -42,7 +42,7 @@ if ($conn->connect_error) {
      </tr>
 
     <?php
-    $query = "SELECT * FROM bookLIST";
+    $query = "SELECT * FROM booklist";
 
     $result = mysqli_query($conn, $query);
 
@@ -54,6 +54,7 @@ if ($conn->connect_error) {
             <td><?php echo $row['author']; ?></td>
             <td><?php echo $row['description']; ?></td>
             <td><?php echo $row['price']; ?></td>
+            <td><a href="editBook.php? ISBN=<?php echo $row['ISBN']; ?>"><button>Edit</button></a></td>
             <td><button>Delete</button></td>
         </tr>
     <?php

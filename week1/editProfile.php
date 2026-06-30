@@ -29,9 +29,9 @@
     <tr>
 
     <tr>
-        <form action="test.php" method="POST">
-            <td><input type=text name=password></td>
-            <td><input type=text name=password></td>
+        <form action="text.php" method="POST">
+            <td><input type=password name=password></td>
+            <td><input type=password name=confirmpassword></td>
             <td><input type=text name=name></td>
             <td><input type=text name=yearjoin></td>
             <td><input type=submit value=Submit></td>
