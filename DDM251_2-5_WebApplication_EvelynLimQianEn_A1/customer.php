@@ -105,7 +105,6 @@ $dbname = "exercise_1";
     <input type="checkbox" id="customer-toggle" class="toggle-input" checked>
     <label for="customer-toggle" class="menu-item actives">
       <span>Customers</span>
-      <div class="arrow">▼</div>
     </label>
 
     <div class="sub-menu">
@@ -113,7 +112,19 @@ $dbname = "exercise_1";
       <a href="customerlist.php" class="sub-active">Customer List</a>
     </div>
 
-    <a href="">Products</a>
+
+    <input type="checkbox" id="customer-toggle" class="toggle-input" checked>
+    <label for="customer-toggle" class="menu-item actives">
+    <span><ahref="product.php">Products</span>
+  </label>
+
+     <div class="sub-menu">
+      <a href="createproduct.php" class="sub-active">Create Product</a>
+      <a href="product.php" class="sub-active">Product List</a>
+    </div>
+
+
+
     <a href="">Orders</a>
     <a href="index.php">Log out</a>
   </div>

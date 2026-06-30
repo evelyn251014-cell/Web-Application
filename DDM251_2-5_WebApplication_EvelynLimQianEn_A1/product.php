@@ -4,13 +4,14 @@ $username = "exercise_1";
 $password = "CphpmI1W5Xsd/C1x";
 $dbname = "exercise_1";
 
+
 $conn = mysqli_connect($servername, $username, $password, $dbname);
 
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$query = "SELECT * FROM customers";
+$query = "SELECT * FROM products";
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -19,8 +20,8 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer List</title>
-     <style>
+    <title>Product List</title>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -70,7 +71,7 @@ $result = mysqli_query($conn, $query);
             background-color: #333333;
         }
 
-        .customer-table {
+        .product-table {
             width: 100%;
             border-collapse: collapse;
             background: #ffffff;
@@ -79,14 +80,14 @@ $result = mysqli_query($conn, $query);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        .customer-table th, 
-        .customer-table td { 
+        .product-table th, 
+        .product-table td { 
             padding: 18px 20px; 
             text-align: left; 
             border-bottom: 1px solid #eeeeee;
         }
 
-        .customer-table th {
+        .product-table th {
             background-color: #f4f4f4;
             font-weight: bold;
             color: #333333;
@@ -106,47 +107,45 @@ $result = mysqli_query($conn, $query);
     </style>
 </head>
 <body>
-    <?php include('customer.php'); ?>
-    <div class="container">
+<?php include('customer.php'); ?>
+<div class="container">
 
-    <div class="button-container">
-            <a href="createcus.php" class="btn-create">Create Account</a>
+  <div class="button-container">
+            <a href="createproduct.php" class="btn-create">Add New Product</a>
     </div>
     
-
-    <table class="customer-table">
-         <h1 class="custitle details">Customer List</h1>
+    <table class="product-table">
+         <h1 class="custitle details">Product List</h1>
             <tr> 
-                <th>CusID</th>
-                <th>Username</th>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Email</th>
-                <th>Password</th>
-                <th>Phone</th>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Price (RM)</th>
+                <th>Stock</th>
             </tr>
 
- <?php
-    $query = "SELECT * FROM customer";
-    if ($result && mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
-?>
-    <tr>
-        <td><?php echo $row['CusID']; ?></td>
-        <td><?php echo $row['Username']; ?></td>
-        <td><?php echo $row['First_name']; ?></td> 
-        <td><?php echo $row['Last_name']; ?></td>
-        <td><?php echo $row['Email']; ?></td>
-        <td><?php echo $row['Password']; ?></td>
-        <td><?php echo $row['Phone']; ?></td>
-        <td><button class="btn-action">Edit</button></td>
-    </tr>
-<?php
-    }
-}
-    mysqli_close($conn);
-?>
-</table>
+        <?php
+            $query = "SELECT * FROM product";
+        if ($result && mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+        ?>
+            <tr>
+                <td><?php echo $row['ProductID']; ?></td>
+                <td><?php echo $row['Name']; ?></td>
+                <td><?php echo $row['Price']; ?></td> 
+                <td><?php echo $row['Stock']; ?></td>
+                <td>
+                <button class="btn-action">Edit</button>
+                </td>
+            </tr>
+        <?php
+            }
+        } 
+        mysqli_close($conn);
+        ?>
+        </tbody>
+    </table>
+
+</div>
 
 </body>
 </html>
