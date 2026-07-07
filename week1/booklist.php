@@ -1,16 +1,24 @@
-<?php
-$servername = "localhost";
-$username = "evelynlim";
-$password = "KOhWKf)4RH8MN.AO";
-$dbname = "evelynlim";
+    <?php
+    session_start();
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-// Check connection
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
-?>
+    $servername = "localhost";
+    $username = "evelynlim";
+    $password = "KOhWKf)4RH8MN.AO";
+    $dbname = "evelynlim";
+
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    // Check connection
+    if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+    }
+
+    // ! not equals to null 
+    if (!isset($_SESSION['email'])) {
+        header("Location: index.php");
+    } 
+
+    ?>
 
 <!DOCTYPE html>
 <html lang="en">

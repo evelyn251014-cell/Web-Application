@@ -1,3 +1,23 @@
+<?php
+session_start();
+
+$servername = "localhost";
+$username = "evelynlim";
+$password = "KOhWKf)4RH8MN.AO";
+$dbname = "evelynlim";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+if (isset($_GET["error"])) {
+    echo "<p style='color:red;'>" . $_GET["error"] . "</p>";
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,8 +50,8 @@
 
     <tr>
         <form action="text.php" method="POST">
-            <td><input type=password name=password></td>
-            <td><input type=password name=confirmpassword></td>
+            <td><input type=password name=password minlength="6"></td>
+            <td><input type=password name=confirmpassword  minlength="6"></td>
             <td><input type=text name=name></td>
             <td><input type=text name=yearjoin></td>
             <td><input type=submit value=Submit></td>
