@@ -10,7 +10,6 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -43,46 +42,52 @@ if ($conn->connect_error) {
             margin-top: 20px;
             margin-bottom: 20px;
         }
-        .btn-submit {
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
+        
+        .error-message {
+            margin-left: 280px;
+            margin-bottom: 15px;
+            color: red;
             font-weight: bold;
         }
-
     </style>
 </head>
 <body>
+    
      <?php include('customer.php'); ?>
 
      <h1 class="custitle details">Create Customer</h1>
 
-    <div class="details">
-        <table>
-            <tr> 
-                <th>CusID</th>
-                <th>Username</th>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Email</th>
-                <th>Password</th>
-                <th>Phone</th>
-            </tr>
+     <?php
+     if (isset($_GET["error"]) && !empty($_GET["error"])) {
+         echo "<p class='error-message'>" . htmlspecialchars($_GET["error"]) . "</p>";
+     }
+     ?>
 
-            <tr>
-                 <form action="insertcust.php" method="POST">
-                <td><input type="text" name=CusID></td>
-                <td><input type="text"  name=Username></td>
-                <td><input type="text"  name=First_name></td>
-                <td><input type="text"  name=Last_name></td>
-                <td><input type="text"  name=Email></td>
-                <td><input type="Password" name=Password></td>
-                <td><input type="text" name=Phone></td>
-                <td><input type=submit value=add ></td>
-                 </form>
-             <tr>
+    <div class="details">
+        <form action="insertcust.php" method="POST">
+            <table>
+                <tr> 
+                    <th>CusID</th>
+                    <th>Username</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Phone</th>
+                </tr>
+
+                <tr>
+                    <td><input type="text" name="CusID"></td>
+                    <td><input type="text" name="Username"></td>
+                    <td><input type="text" name="First_name"></td>
+                    <td><input type="text" name="Last_name"></td>
+                    <td><input type="text" name="Email"></td>
+                    <td><input type="password" name="Password"></td>
+                    <td><input type="text" name="Phone"></td>
+                    <td><input type="submit" name="submit_btn" value="add"></td>
+                </tr>
+            </table>
+        </form>
     </div>
 </body>
 </html>
