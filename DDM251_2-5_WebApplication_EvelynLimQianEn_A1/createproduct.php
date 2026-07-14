@@ -33,7 +33,6 @@ if ($conn->connect_error) {
             max-width: 1200px;
             margin-left: 290px;
             margin-top: 20px;
-            
         }
 
         .page-title {
@@ -45,6 +44,12 @@ if ($conn->connect_error) {
             display: inline-block;
             font-weight: bold;
             margin-bottom: 30px;
+        }
+
+       .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 15px;
         }
 
         .form-card {
@@ -91,31 +96,41 @@ if ($conn->connect_error) {
             border-radius: 6px;
             cursor: pointer;
         }
+
+   
     </style>
 </head>
 <body>
 <?php include('customer.php'); ?>
 
 <div class="container">
+  
+<h1 class="page-title">Create Product</h1>
 
-    <h1 class="page-title">Create Product</h1>
+<?php
+    if (isset($_GET["error"]) && !empty($_GET["error"])) {
+         echo "<p class='error-message'>" . htmlspecialchars($_GET["error"]) . "</p>";
+    }
+    ?>
 
     <div class="form-card">
         <table class="product-table">
             <tr> 
-                        <th>Product ID</th>
-                        <th>Product Name</th>
-                        <th>Price (RM)</th>
-                        <th>Stock</th>
-</tr>
-                <tr>
-                    <form action="insertproduct.php" method="POST">
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Price (RM)</th>
+                <th>Stock</th>
+            </tr>
+            <tr>
+                <form action="insertproduct.php" method="POST">
                     <td><input type="text" name="ProductID" class="form-control"></td>
                     <td><input type="text" name="Name" class="form-control"></td>
                     <td><input type="text" name="Price" class="form-control"></td>
                     <td><input type="text" name="Stock" class="form-control"></td>
                     <td style="text-align: right;">
-                    <input type="submit" class="btn-add" value="Add"></td>
+                    <input type="submit" name="submit_btn" class="btn-add" value="Add">
+                    </td>
+                </form>
             </tr>
         </table>
     </div>

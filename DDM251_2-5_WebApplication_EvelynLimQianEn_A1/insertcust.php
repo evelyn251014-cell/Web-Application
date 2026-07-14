@@ -15,7 +15,7 @@ if (isset($_POST["submit_btn"])) {
 
   if (empty($_POST["CusID"]) || empty($_POST["Username"]) || empty($_POST["First_name"]) || empty($_POST["Last_name"]) || empty($_POST["Email"]) || empty($_POST["Password"]) || empty($_POST["Phone"])) {
         
-        header("Location: createcus.php?error=Please fill in all fields. All data is required!");
+        header("Location: createcus.php?error=Please fill in all fields!");
         exit();
 
     } else if (strlen($_POST["Password"]) != 6) {
