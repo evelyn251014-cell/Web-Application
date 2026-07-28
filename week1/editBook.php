@@ -15,7 +15,6 @@ $ISBN = $_GET["ISBN"];
 $sql = "SELECT * FROM booklist WHERE ISBN='$ISBN'";
 $result = mysqli_query($conn, $sql);
 $row = mysqli_fetch_assoc($result);
-
 ?>
 
 <!DOCTYPE html>

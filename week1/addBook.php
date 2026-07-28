@@ -10,6 +10,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -28,12 +30,23 @@ if ($conn->connect_error) {
         td {
             border: 1px solid black;
         }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
-    <button><a class="link href="booklist.php>Back</a></button>
+    <button><a href="booklist.php">Back</a></button>
     <table width="600">
+
+ <?php
+     if (isset($_GET["error"]) && !empty($_GET["error"])) {
+         echo "<p class='error-message'>" . htmlspecialchars($_GET["error"]) . "</p>";
+     }
+     ?>
 
     <tr>
         <th>ISBN</th>
@@ -50,7 +63,7 @@ if ($conn->connect_error) {
             <td><input type=text name=author></td>
             <td><textarea cols='50' input type=text name=description></textarea></td>
             <td><input type=text name=price></td>
-            <td><input type=submit value=add></td>
+            <td><input type=submit name="submit_btn" value=add></td>
         </form>
     <tr>
 </body>

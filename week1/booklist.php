@@ -62,8 +62,8 @@
             <td><?php echo $row['author']; ?></td>
             <td><?php echo $row['description']; ?></td>
             <td><?php echo $row['price']; ?></td>
-            <td><a href="editBook.php? ISBN=<?php echo $row['ISBN']; ?>"><button>Edit</button></a></td>
-            <td><button>Delete</button></td>
+            <td><a href="editBook.php?ISBN=<?php echo $row['ISBN']; ?>"><button>Edit</button></a></td>
+            <td><a href="deletebooklist.php?ISBN=<?php echo $row['ISBN']; ?>" onclick="myFunction('<?php echo $row['ISBN']; ?>')"><button>Delete</button></a></td>
         </tr>
     <?php
     }
@@ -72,8 +72,19 @@
     ?>
     <a href="profile.php"><input type="submit" value="Profile"></a>
     <a href="addBook.php"><input type="submit" value="AddBook"></a>
-    <a href=""><input type="submit" value="Logout"></a>
+    <a href="logout.php"><input type="submit" value="Logout"></a>
 </table>
 
 </body>
+
+
+<script>
+function myFunction(ISBN) {
+    let text = "Are you sure you want to delete" + ISBN + "?";
+    if (confirm(text) == true) {
+    window.location.href ="deletebooklist.php?ISBN" + ISBN;
+    }
+}
+</script>
+
 </html>
