@@ -124,7 +124,7 @@ $result = mysqli_query($conn, $query);
             </tr>
 
         <?php
-            $query = "SELECT * FROM product";
+            $query = "SELECT * FROM products";
         if ($result && mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
         ?>
@@ -135,6 +135,9 @@ $result = mysqli_query($conn, $query);
                 <td><?php echo $row['Stock']; ?></td>
                 <td>
                 <button class="btn-action">Edit</button>
+                </td>
+                <td><a href="#" onclick="myFunction('<?php echo $row['ProductID']; ?>')"><button class="btn-action">Delete</button>
+                </a>
                 </td>
             </tr>
         <?php
@@ -147,4 +150,14 @@ $result = mysqli_query($conn, $query);
 </div>
 
 </body>
+<script>
+function myFunction(ProductID) {
+    let text = "Are you sure you want to delete " + ProductID + "?";
+
+    if (confirm(text) == true) {
+        window.location.href = "deleteproduct.php?ProductID=" + ProductID;
+    }
+}
+</script>
+
 </html>

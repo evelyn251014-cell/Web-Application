@@ -140,6 +140,9 @@ $result = mysqli_query($conn, $query);
         <td><?php echo $row['Password']; ?></td>
         <td><?php echo $row['Phone']; ?></td>
         <td><button class="btn-action">Edit</button></td>
+        <td><a href="#" onclick="myFunction('<?php echo $row['CusID']; ?>')"><button class="btn-action">Delete</button>
+        </a>
+        </td>
     </tr>
 <?php
     }
@@ -147,6 +150,14 @@ $result = mysqli_query($conn, $query);
     mysqli_close($conn);
 ?>
 </table>
+<script>
+function myFunction(CusID) {
+    let text = "Are you sure you want to delete " + CusID + "?";
 
+    if (confirm(text) == true) {
+        window.location.href = "deletecus.php?CusID=" + CusID;
+    }
+}
+</script>
 </body>
 </html>
