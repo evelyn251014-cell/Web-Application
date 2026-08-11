@@ -10,6 +10,7 @@ if ($conn->connect_error) {
 die("Connection failed: " . $conn->connect_error);
 }
 
+
 if(isset($_POST['book'])){
 
     $event_id = $_POST['event_id'];
@@ -18,9 +19,10 @@ if(isset($_POST['book'])){
     mysqli_query($conn, "INSERT INTO booking(Event_ID) VALUES('$event_id')");
 
     echo "<script>
-    alert('Booking Successful!')'
+    alert('You have booked successfully!');
+    window.location.href = 'booking.php';
     </script>";
-    header("Location:booking.php");
+
     exit();
 }
 ?>
@@ -44,7 +46,7 @@ if(isset($_POST['book'])){
     </style>
 </head>
 <body>
-     <a href=""><input type="submit" value="Profile"></a>
+     <a href="profile.php"><input type="submit" value="Profile"></a>
     <div>
         <h1>Please select your date</h1>
         <div class="filter_btn">
@@ -62,24 +64,75 @@ if(isset($_POST['book'])){
             <th>Slot</th>
         </tr>
 
-        
-    <?php
-    
-    $query = "SELECT * FROM booking";
-    $result = mysqli_query($conn, $query);
+  <?php
 
+$query = "SELECT * FROM booking WHERE Event_Name IS NOT NULL AND Event_Name != ''";
+$result = mysqli_query($conn, $query);
+
+while($row = mysqli_fetch_assoc($result)){
+
+    if(empty($row['Event_Name'])){
+        continue;
+    }
+
+    $event_id = $row['Event_ID'];
+
+    // your slot code here
+    $total = 3;
+
+    $booking_query = "SELECT COUNT(*) AS booked 
+                      FROM booking 
+                      WHERE Event_ID='$event_id'";
+
+    $booking_result = mysqli_query($conn, $booking_query);
+    $data = mysqli_fetch_assoc($booking_result);
 
     $remain = $total - $data['booked'];
-    while($row = mysqli_fetch_assoc($result)){
-    ?>
-        <tr class="filter <?php echo $row['Event_Date']; ?>">
-            <td><?php echo $row['Event_ID']; ?></td>
-            <td><?php echo $row['Event_Name']; ?></td>
-            <td><button>3/3 Slot</button></td>
-        </tr>
-    <?php
-    }
-    ?>
+
+?>
+
+<tr class="filter <?php echo $row['Event_Date']; ?>">
+
+    <td><?php echo $row['Event_ID']; ?></td>
+
+    <td><?php echo $row['Event_Name']; ?></td>
+
+    <td>
+        <?php echo $remain . "/" . $total; ?> Slot
+    </td>
+
+    <td>
+
+    <?php if($remain > 0){ ?>
+
+        <form method="post">
+
+
+    <input type="hidden" 
+    name="event_id"
+    value="<?php echo $row['Event_ID']; ?>">
+
+
+    <input type="submit" 
+    name="book"
+    value="Book">
+
+        </form>
+
+    <?php } else { ?>
+
+        Full
+
+    <?php } ?>
+
+    </td>
+
+</tr>
+
+<?php
+}
+?>
+
 </body> 
 
 <script>
