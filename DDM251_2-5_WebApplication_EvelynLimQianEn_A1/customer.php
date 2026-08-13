@@ -123,9 +123,18 @@ $dbname = "exercise_1";
       <a href="product.php" class="sub-active">Product List</a>
     </div>
 
+    
+    <input type="checkbox" id="customer-toggle" class="toggle-input" checked>
+    <label for="customer-toggle" class="menu-item actives">
+    <span><ahref="order.php">Order</span>
+  </label>
 
+     <div class="sub-menu">
+      <a href="createorder.php" class="sub-active">Create Order</a>
+      <a href="order.php" class="sub-active">Order List</a>
+    </div>
 
-    <a href="">Orders</a>
+    
     <a href="index.php">Log out</a>
   </div>
 
