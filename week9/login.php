@@ -22,11 +22,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $conn->query($sql);
    
     if ($result->num_rows > 0) {
-      $_SESSION['email'] = $_POST['email'];
-      header("Location:booking.php");
-        echo "User Found";
-    } else {
-        echo "User is not found";
+    $row = $result->fetch_assoc();
+
+    $_SESSION['CusID'] = $row['CusID'];
+    $_SESSION['cus_id'] = $row['CusID'];
+    $_SESSION['email'] = $row['Email'];
+
+    header("Location: booking.php");
+    exit();
     }
 }
 ?>
@@ -58,8 +61,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <br>
                 <h2>Password</h2>
                 <input type="password" name="password">
-                <input type="submit">
-            <form>
+                <input type="submit" value="Login">
+            </form>
         </div>
 </body>
 </html>
