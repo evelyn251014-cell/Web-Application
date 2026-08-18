@@ -6,7 +6,7 @@ $dbname = "exercise_1";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 ?>
 
@@ -16,6 +16,7 @@ if ($conn->connect_error) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Product</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -26,13 +27,85 @@ if ($conn->connect_error) {
 
         body {
             background-color: #fcfbf9;
-            padding: 40px;
+            display: flex;
+        }
+
+        .sidebar-menu {
+            width: 260px;
+            height: 100vh;
+            background-color: #000000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            z-index: 100;
+        }
+
+        .title {
+            color: #ffffff;
+            margin: 30px;
+            font-size: 25px;
+            text-decoration: underline;
+        }
+
+        .sidebar-menu a, 
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: #ffffff;
+            padding: 15px 25px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover, 
+        .menu-item:hover {
+            color: #ffffff;
+            background-color: #5b5b62;
+            border-radius: 10px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-input:checked + .menu-item + .sub-menu {
+            max-height: 200px;
+        }
+
+        .sub-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: #000000;
+        } 
+
+        .sub-menu a {
+            display: block;
+            text-decoration: none;
+            color: #b3b3b3;
+            padding: 10px 0 10px 45px;
+            font-size: 15px;
+            background-color: #000000;
+        }
+
+        .sub-menu a.sub-active {
+            text-align: left;
+            color: #ffffff; 
+            padding-left: 45px;
+        }
+
+        .sub-menu a:hover {
+            color: #ffffff;
+            background-color: #1a1a1a;
         }
 
         .container {
-            max-width: 1200px;
-            margin-left: 290px;
-            margin-top: 20px;
+            width: calc(100% - 260px);
+            margin-left: 260px;
+            padding: 40px;
         }
 
         .page-title {
@@ -46,7 +119,7 @@ if ($conn->connect_error) {
             margin-bottom: 30px;
         }
 
-       .error-message {
+        .error-message {
             color: red;
             font-weight: bold;
             margin-bottom: 15px;
@@ -96,45 +169,86 @@ if ($conn->connect_error) {
             border-radius: 6px;
             cursor: pointer;
         }
-
-   
     </style>
 </head>
 <body>
-<?php include('customer.php'); ?>
+
+  <div class="sidebar-menu">
+    <h2 class="title">Evelyn's Shop</h2>
+
+    <a href="dashboard.php" class="menu-item">
+      <span><i class="fa-solid fa-gauge"></i> Dashboard</span>
+    </a>
+
+    <input type="checkbox" id="customer-toggle" class="toggle-input">
+    <label for="customer-toggle" class="menu-item">
+      <span><i class="fa-solid fa-user"></i> Customers</span>
+    </label>
+    <div class="sub-menu">
+      <a href="createcus.php">Create Customer</a>
+      <a href="customerlist.php">Customer List</a>
+    </div>
+
+
+    <input type="checkbox" id="product-toggle" class="toggle-input">
+    <label for="product-toggle" class="menu-item">
+      <span><i class="fa-solid fa-box"></i> Products</span>
+    </label>
+    <div class="sub-menu">
+      <a href="createproduct.php">Create Product</a>
+      <a href="product.php">Product List</a>
+    </div>
+
+
+    <input type="checkbox" id="order-toggle" class="toggle-input">
+    <label for="order-toggle" class="menu-item">
+      <span><i class="fa-solid fa-cart-shopping"></i> Order</span>
+    </label>
+    <div class="sub-menu">
+      <a href="createorder.php">Create Order</a>
+      <a href="order.php">Order List</a>
+    </div>
+
+    <a href="index.php" class="menu-item">
+      <span><i class="fa-solid fa-right-from-bracket"></i> Log out</span>
+    </a>
+  </div>
 
 <div class="container">
-  
-<h1 class="page-title">Create Product</h1>
+  <h1 class="page-title">Create Product</h1>
 
-<?php
-    if (isset($_GET["error"]) && !empty($_GET["error"])) {
-         echo "<p class='error-message'>" . htmlspecialchars($_GET["error"]) . "</p>";
-    }
-    ?>
+  <?php
+  if (isset($_GET["error"]) && !empty($_GET["error"])) {
+      echo "<p class='error-message'>" . htmlspecialchars($_GET["error"]) . "</p>";
+  }
+  ?>
 
-    <div class="form-card">
-        <table class="product-table">
+  <div class="form-card">
+    <form action="insertproduct.php" method="POST">
+      <table class="product-table">
+          <thead>
             <tr> 
                 <th>Product ID</th>
                 <th>Product Name</th>
                 <th>Price (RM)</th>
                 <th>Stock</th>
+                <th>Action</th>
             </tr>
+          </thead>
+          <tbody>
             <tr>
-                <form action="insertproduct.php" method="POST">
-                    <td><input type="text" name="ProductID" class="form-control"></td>
-                    <td><input type="text" name="Name" class="form-control"></td>
-                    <td><input type="text" name="Price" class="form-control"></td>
-                    <td><input type="text" name="Stock" class="form-control"></td>
-                    <td style="text-align: right;">
+                <td><input type="text" name="ProductID" class="form-control" required></td>
+                <td><input type="text" name="Name" class="form-control" required></td>
+                <td><input type="number" step="0.01" name="Price" class="form-control" required></td>
+                <td><input type="number" name="Stock" class="form-control" required></td>
+                <td style="text-align: right;">
                     <input type="submit" name="submit_btn" class="btn-add" value="Add">
-                    </td>
-                </form>
+                </td>
             </tr>
-        </table>
-    </div>
-
+          </tbody>
+      </table>
+    </form>
+  </div>
 </div>
 
 </body>

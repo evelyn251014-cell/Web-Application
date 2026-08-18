@@ -34,7 +34,7 @@ if ($username != "" && $password != "" && !$conn->connect_error) {
             $row = $result->fetch_assoc();
             if ($row['Password'] == $password) {
                 echo"Customer Found";
-                 header("Location: customer.php");
+                 header("Location: dashboard.php");
             } else {
                 $message = "* Your password is incorrect.<br/>";
             } 

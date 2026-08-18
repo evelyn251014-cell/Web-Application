@@ -10,48 +10,47 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$customer_result = mysqli_query($conn, "SELECT Username FROM customers");
-$product_result = mysqli_query($conn, "SELECT Name FROM products");
+$product_id = isset($_GET['ProductID']) ? $_GET['ProductID'] : '';
+$existing_product = null;
 
-$products_list = [];
-if ($product_result && mysqli_num_rows($product_result) > 0) {
-    while ($row = mysqli_fetch_assoc($product_result)) {
-        $products_list[] = $row;
+if (!empty($product_id)) {
+    $product_id_clean = mysqli_real_escape_string($conn, $product_id);
+    $fetch_query = "SELECT * FROM products WHERE ProductID = '$product_id_clean' LIMIT 1";
+    $fetch_res = mysqli_query($conn, $fetch_query);
+    if ($fetch_res && mysqli_num_rows($fetch_res) > 0) {
+        $existing_product = mysqli_fetch_assoc($fetch_res);
     }
 }
 
 $errors = [];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    if (empty($_POST['Username'])) {
-        $errors[] = "Please select a username.";
+    if (empty($_POST['Name'])) {
+        $errors[] = "Please enter product name.";
     }
-
-    if (empty($_POST['Product'])) {
-        $errors[] = "Please select a product.";
+    if (empty($_POST['Price'])) {
+        $errors[] = "Please enter price.";
     }
-
-    if (empty($_POST['Quantity'])) {
-        $errors[] = "Please select a quantity.";
+    if (empty($_POST['Stock'])) {
+        $errors[] = "Please enter stock amount.";
     }
 
     if (empty($errors)) {
-        $user = $_POST['Username'];
-        $prod_name = $_POST['Product'];
-        $qty = (int)$_POST['Quantity'];
-        $order_date = date("Y-m-d H:i:s");
+        $target_id = mysqli_real_escape_string($conn, $_POST['ProductID']);
+        $name = mysqli_real_escape_string($conn, $_POST['Name']);
+        $price = (float)$_POST['Price'];
+        $stock = (int)$_POST['Stock'];
 
-        $stmt = mysqli_prepare($conn, "INSERT INTO orders (Username, Product, Quantity, Order_Date) VALUES (?, ?, ?, ?)");
-
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "ssis", $user, $prod_name, $qty, $order_date);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
+        $update_query = "UPDATE products 
+                        SET Name = '$name', Price = $price, Stock = $stock 
+                        WHERE ProductID = '$target_id'";
+        
+        if (mysqli_query($conn, $update_query)) {
+            header("Location: product.php");
+            exit();
+        } else {
+            $errors[] = "Error updating product: " . mysqli_error($conn);
         }
-
-        mysqli_close($conn);
-        header("Location: order.php");
-        exit();
     }
 }
 ?>
@@ -61,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Order</title>
+    <title>Edit Product</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -174,8 +173,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #34a853; 
         }
 
-        .btn-green:hover { 
-            background-color: #2d9247; 
+        .btn-green:hover {
+            background-color: #2d9247;
         }
 
         .error-banner {
@@ -199,13 +198,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 5px;
         }
 
-        select {
+        input[type="text"], input[type="number"] {
             padding: 10px;
             border: 1px solid #cccccc;
             border-radius: 4px;
             font-size: 14px;
             outline: none;
             width: 320px;
+        }
+
+        input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            color: #555555;
+            font-weight: bold;
         }
 
         .action-group {
@@ -258,7 +264,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <div class="container">
 
-    <h1 class="custitle">Create Order</h1>
+    <h1 class="custitle">Edit Product</h1>
 
     <?php if (!empty($errors)): ?>
         <?php foreach ($errors as $err): ?>
@@ -266,50 +272,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endforeach; ?>
     <?php endif; ?>
 
-    <form method="POST" action="createorder.php">
+    <form method="POST" action="editproduct.php">
         
         <div class="form-col">
-            <label for="username-select">Username:</label>
-            <select name="Username" id="username-select">
-                <option value="">&lt;-- Select Username --&gt;</option>
-                <?php 
-                if ($customer_result && mysqli_num_rows($customer_result) > 0) {
-                    while ($c = mysqli_fetch_assoc($customer_result)) {
-                        $selected = (isset($_POST['Username']) && $_POST['Username'] === $c['Username']) ? 'selected' : '';
-                        echo "<option value='" . htmlspecialchars($c['Username']) . "' $selected>" . htmlspecialchars($c['Username']) . "</option>";
-                    }
-                }
-                ?>
-            </select>
+            <label for="product-id">Product ID:</label>
+            <input type="text" id="product-id" name="ProductID" value="<?php echo htmlspecialchars(isset($existing_product['ProductID']) ? $existing_product['ProductID'] : $product_id); ?>" readonly />
         </div>
 
         <div class="form-col">
-            <label for="product-select">Product:</label>
-            <select name="Product" id="product-select">
-                <option value="">&lt;-- Select Product --&gt;</option>
-                <?php foreach ($products_list as $p): ?>
-                    <?php $selected = (isset($_POST['Product']) && $_POST['Product'] === $p['Name']) ? 'selected' : ''; ?>
-                    <option value="<?php echo htmlspecialchars($p['Name']); ?>" <?php echo $selected; ?>>
-                        <?php echo htmlspecialchars($p['Name']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <label for="name">Product Name:</label>
+            <input type="text" id="name" name="Name" value="<?php echo htmlspecialchars(isset($existing_product['Name']) ? $existing_product['Name'] : ''); ?>" required />
         </div>
 
         <div class="form-col">
-            <label for="quantity-select">Quantity:</label>
-            <select name="Quantity" id="quantity-select">
-                <option value="">&lt;-- Select Quantity --&gt;</option>
-                <?php for ($i = 1; $i <= 10; $i++): ?>
-                    <?php $selected = (isset($_POST['Quantity']) && (int)$_POST['Quantity'] === $i) ? 'selected' : ''; ?>
-                    <option value="<?php echo $i; ?>" <?php echo $selected; ?>><?php echo $i; ?></option>
-                <?php endfor; ?>
-            </select>
+            <label for="price">Price (RM):</label>
+            <input type="number" step="0.01" id="price" name="Price" value="<?php echo htmlspecialchars(isset($existing_product['Price']) ? $existing_product['Price'] : ''); ?>" required />
+        </div>
+
+        <div class="form-col">
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="Stock" value="<?php echo htmlspecialchars(isset($existing_product['Stock']) ? $existing_product['Stock'] : ''); ?>" required />
         </div>
 
         <div class="action-group">
-            <button type="submit" class="btn-action btn-green">SUBMIT</button>
-            <a href="order.php" class="btn-action">BACK TO ORDER LIST</a>
+            <button type="submit" class="btn-action btn-green">UPDATE PRODUCT</button>
+            <a href="product.php" class="btn-action">CANCEL</a>
         </div>
 
     </form>
