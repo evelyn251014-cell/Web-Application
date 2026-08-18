@@ -13,26 +13,33 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$_SESSION['play_count'] = $_SESSION['play_count'] ?? 0;
-
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_number'])) {
-    if ($_SESSION['play_count'] >= 2) {
+    
+    $uid = $_SESSION['cus_id'];
+
+    // 1. Fetch current play count using exact column: G1_GameClick
+    $result = $conn->query("SELECT G1_GameClick FROM guest WHERE UID = '$uid'");
+    $row = $result->fetch_assoc();
+    $current_count = (int)($row['G1_GameClick'] ?? 0);
+
+    // 2. Check 2-submit limit
+    if ($current_count >= 2) {
         echo "<script>alert('Limit reached! You cannot submit more than 2 times.'); window.location.href='game1.php';</script>";
         exit();
     }
     
-    $email = $_SESSION['email'];
     $selected_number = (int)$_POST['btn_number'];
-    
 
-    $sql = "UPDATE guest SET G1 = '$selected_number' WHERE Email = '$email'";
+    // 3. Update G1 choice and increment G1_GameClick by +1
+    $sql = "UPDATE guest SET G1 = '$selected_number', G1_GameClick = G1_GameClick + 1 WHERE UID = '$uid'";
 
-   if ($conn->query($sql) === TRUE) {
-        $_SESSION['play_count']++; 
-        echo "<script>alert('Updated! Play count: " . $_SESSION['play_count'] . "/2'); window.location.href='game1.php';</script>";
+    if ($conn->query($sql) === TRUE) {
+        $new_count = $current_count + 1;
+        echo "<script>alert('Updated! Play count: " . $new_count . "/2'); window.location.href='game1.php';</script>";
         exit();
-   }
+    }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_number'])) {
     <title>Game 1</title>
 </head>
 <body>
+
+    <button><a href="game.php">Back</a></button>
 
     <h1>Game 1</h1>
 

@@ -138,6 +138,8 @@ $dbname = "exercise_1";
     <a href="index.php">Log out</a>
   </div>
 
+  
+
 
 </body>
 </html>
