@@ -16,6 +16,21 @@ $shop_id = intval($_GET['shop_id'] ?? 0);
 $drink   = $_GET['drink'] ?? 'your drink';
 $message = "";
 
+// Get current logged-in username and their User_id from DB
+$logged_user = $_SESSION['username'] ?? '';
+$user_id     = "Anonymous";
+
+if ($logged_user) {
+    $stmt_u = $conn->prepare("SELECT User_id FROM customers WHERE Username = ?");
+    $stmt_u->bind_param("s", $logged_user);
+    $stmt_u->execute();
+    $res_u = $stmt_u->get_result()->fetch_assoc();
+    if ($res_u) {
+        $user_id = "User #" . $res_u['User_id'];
+    }
+    $stmt_u->close();
+}
+
 $stmt = $conn->prepare("SELECT * FROM shop WHERE Shop_id = ?");
 $stmt->bind_param("i", $shop_id);
 $stmt->execute();
@@ -23,15 +38,23 @@ $shop = $stmt->get_result()->fetch_assoc() ?: ['Name' => 'Unknown Cafe', 'Specia
 $stmt->close();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'])) {
-    $username = trim($_POST['username'] ?? '');
-    $rating   = intval($_POST['rating'] ?? 0);
-    $comment  = trim($_POST['comment'] ?? '');
+    $rating  = intval($_POST['rating'] ?? 0);
+    $comment = trim($_POST['comment'] ?? '');
+    
+    // Check if the user ticked the checkbox to show username
+    $show_username = isset($_POST['show_username']);
+    
+    if ($show_username && !empty($logged_user)) {
+        $display_name = $logged_user;
+    } else {
+        $display_name = $user_id; // Fallback to User ID
+    }
 
     $res = $conn->query("SELECT MAX(Feedback_id) AS max_id FROM feedback");
     $feedback_id = (($res ? $res->fetch_assoc()['max_id'] : null) ?? 0) + 1;
 
     $stmt = $conn->prepare("INSERT INTO feedback (Feedback_id, Shop_id, Username, Rating, Comment, Feedback_date) VALUES (?, ?, ?, ?, ?, NOW())");
-    $stmt->bind_param("iisis", $feedback_id, $shop_id, $username, $rating, $comment);
+    $stmt->bind_param("iisis", $feedback_id, $shop_id, $display_name, $rating, $comment);
     if ($stmt->execute()) {
         $message = "Thank you for your feedback!";
     }
@@ -159,7 +182,6 @@ $feedback_result = $stmt_fb->get_result();
             font-weight: 600; 
             font-size: 14px; 
         }
-        input, 
         textarea, 
         select { 
             width: 100%; 
@@ -172,6 +194,20 @@ $feedback_result = $stmt_fb->get_result();
         textarea { 
             height: 100px; 
             resize: vertical; 
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #5C321E;
+        }
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
         .btn-submit { 
             width: 100%; 
@@ -250,8 +286,14 @@ $feedback_result = $stmt_fb->get_result();
     <h2 class="form-title">Give Your Feedback</h2>
 
     <form method="POST">
-        <label>Username</label>
-        <input type="text" name="username" placeholder="Enter your username" required>
+        <!-- Checkbox to toggle Username vs User ID -->
+        <div class="checkbox-container">
+            <input type="checkbox" id="show_username" name="show_username" value="1">
+            <label for="show_username">Display my Username (<b><?= htmlspecialchars($logged_user) ?></b>) publicly</label>
+        </div>
+        <p style="font-size: 12px; color: #7A6055; margin-bottom: 15px;">
+            If unchecked, your feedback will be posted under <b><?= htmlspecialchars($user_id) ?></b>.
+        </p>
 
         <label>Rating</label>
         <select name="rating" required>

@@ -1,13 +1,7 @@
 <?php
 session_start();
 
-$servername = "localhost";
-$dbusername = "coffee_shop";
-$dbpassword = "1ew.Fibz@DynoYxL";
-$dbname     = "coffee_shop";
-
-$conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
-
+$conn = new mysqli("localhost", "coffee_shop", "1ew.Fibz@DynoYxL", "coffee_shop");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -15,28 +9,34 @@ if ($conn->connect_error) {
 $message = "";
 
 if (isset($_POST['register'])) {
-    $user        = trim($_POST['Username']);
-    $email       = trim($_POST['Email']);
-    $pass        = $_POST['Password'];
-    $confirmPass = $_POST['ConfirmPassword'];
-    $phone       = trim($_POST['Phone']);
+    $user        = trim($_POST['Username'] ?? '');
+    $email       = trim($_POST['Email'] ?? '');
+    $pass        = $_POST['Password'] ?? '';
+    $confirmPass = $_POST['ConfirmPassword'] ?? '';
+    $phone       = trim($_POST['Phone'] ?? '');
 
-    if ($pass !== $confirmPass) {
+    // 1. Password restriction: Check if less than 6 characters
+    if (strlen($pass) < 6) {
+        $message = "Password must be more than 6 characters.";
+    } 
+    // 2. Check if passwords match
+    elseif ($pass !== $confirmPass) {
         $message = "Passwords do not match.";
-    } else {
-        
+    } 
+    // 3. Phone restriction: Check length and ensure digits only
+    elseif (!ctype_digit($phone) || strlen($phone) < 10 || strlen($phone) > 11) {
+        $message = "Phone number must be a valid Malaysian number (10 to 11 digits).";
+    } 
+    else {
         $stmt_check = $conn->prepare("SELECT Username FROM customers WHERE Username = ?");
         $stmt_check->bind_param("s", $user);
         $stmt_check->execute();
-        $check_result = $stmt_check->get_result();
 
-        if ($check_result->num_rows > 0) {
+        if ($stmt_check->get_result()->num_rows > 0) {
             $message = "Username already exists.";
         } else {
-
-            $countResult = mysqli_query($conn, "SELECT COUNT(*) AS total FROM customers");
-            $countData   = mysqli_fetch_assoc($countResult);
-            $new_id      = $countData['total'] + 1;
+            $res = $conn->query("SELECT MAX(User_id) AS max_id FROM customers");
+            $new_id = (($res ? $res->fetch_assoc()['max_id'] : null) ?? 0) + 1;
 
             $stmt_insert = $conn->prepare("INSERT INTO customers (User_id, Username, Email, Password, Phone) VALUES (?, ?, ?, ?, ?)");
             $stmt_insert->bind_param("issss", $new_id, $user, $email, $pass, $phone);
@@ -62,6 +62,12 @@ if (isset($_POST['register'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - BrewMatch</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #F4EFEB;
@@ -73,25 +79,22 @@ if (isset($_POST['register'])) {
             align-items: center;
             min-height: 100vh;
             color: #2C1810;
-            margin: 0;
-            box-sizing: border-box;
         }
 
         .container {
             max-width: 450px;
             width: 100%;
             margin: auto;
-            background: white;
+            background: #FFFFFF;
             padding: 35px 30px;
             border-radius: 15px;
             box-shadow: 0 12px 32px rgba(63, 29, 14, 0.08);
-            box-sizing: border-box;
         }
 
         .title {
             text-align: center;
             font-size: 32px;
-            margin: 0 0 5px 0;
+            margin-bottom: 5px;
             color: #2C1810;
             font-weight: 700;
         }
@@ -120,7 +123,6 @@ if (isset($_POST['register'])) {
             padding: 12px;
             margin-top: 2px;
             margin-bottom: 8px;
-            box-sizing: border-box;
             border: 1px solid #E5D8CC;
             border-radius: 8px;
             font-family: inherit;
@@ -182,7 +184,7 @@ if (isset($_POST['register'])) {
 
         .error {
             color: #D9534F;
-            background: #ffecec;
+            background: #FFECEC;
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -195,14 +197,22 @@ if (isset($_POST['register'])) {
 <body>
 
 <div class="container">
-    <h1 class="title">BrewMatch</h1>
-    <div class="subtitle">Create an account to get started</div>
+    <h1 class="title">
+        BrewMatch
+    </h1>
+
+    <div class="subtitle">
+        Create an account to get started
+    </div>
 
     <?php if (!empty($message)): ?>
-        <div class="error"><?php echo htmlspecialchars($message); ?></div>
+        <div class="error">
+            <?= htmlspecialchars($message) ?>
+        </div>
     <?php endif; ?>
 
-    <form method="POST">
+    <!-- Added novalidate to prevent HTML5 built-in overrides -->
+    <form method="POST" novalidate>
         <div class="input-title">Username</div>
         <input type="text" name="Username" placeholder="Enter your username" required>
 
@@ -210,23 +220,24 @@ if (isset($_POST['register'])) {
         <input type="email" name="Email" placeholder="Enter your email" required>
 
         <div class="input-title">Password</div>
-        <input type="password" name="Password" placeholder="Enter password" required>
+        <input type="password" name="Password" placeholder="Enter password (at least 6 characters)" required>
 
         <div class="input-title">Confirm Password</div>
         <input type="password" name="ConfirmPassword" placeholder="Re-enter password" required>
 
         <div class="input-title">Phone</div>
-        <input type="text" name="Phone" placeholder="Enter phone number" required>
+        <input type="text" name="Phone" placeholder="Enter phone number (e.g. 0123456789)" required>
 
         <input type="submit" name="register" class="button" value="Register">
 
-        <a href="Login.php" class="login-link">Already have an account? Login here</a>
+        <a href="Login.php" class="login-link">
+            Already have an account? Login here
+        </a>
     </form>
 </div>
 
 </body>
 </html>
-
 <?php
-mysqli_close($conn);
+$conn->close();
 ?>
